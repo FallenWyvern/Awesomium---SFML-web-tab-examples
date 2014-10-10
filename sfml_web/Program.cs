@@ -32,10 +32,11 @@ namespace sfml_web
             win.MouseButtonPressed += new EventHandler<MouseButtonEventArgs>(win_MouseButtonPressed);
             win.MouseButtonReleased += new EventHandler<MouseButtonEventArgs>(win_MouseButtonReleased);
             win.MouseMoved += new EventHandler<MouseMoveEventArgs>(win_MouseMoved);
-            win.KeyPressed += new EventHandler<KeyEventArgs>(win_KeyPressed);
+            win.KeyPressed += new EventHandler<KeyEventArgs>(win_KeyPressed);            
 
             BrowserManager.NewTab(0, @"http://www.reddit.com", 300, 400, 0, 0);
-            BrowserManager.NewTab(1, @"http://www.youtube.com", 300, 400, 400, 0);    
+            BrowserManager.NewTab(1, @"http://www.youtube.com", 300, 400, 400, 0);
+            BrowserManager.NewTab(2, @"http://m.wikipedia.org", 300, 400, 0, 400);            
 
             while (win.IsOpen())
             {
@@ -48,7 +49,7 @@ namespace sfml_web
 
         static void win_KeyPressed(object sender, KeyEventArgs e)
         {
-            BrowserManager.InjectKey(e.Code, win.InternalGetMousePosition().X, win.InternalGetMousePosition().Y);
+            BrowserManager.InjectKey(e.Code, win.InternalGetMousePosition().X, win.InternalGetMousePosition().Y);                    
         }
 
         static void win_MouseMoved(object sender, MouseMoveEventArgs e)

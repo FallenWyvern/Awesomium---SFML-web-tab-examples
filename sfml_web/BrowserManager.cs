@@ -213,21 +213,24 @@ namespace sfml_web
                     }, null);
                 }                
             }
-            
-            Tabs.Reverse();
-            foreach (BrowserTab t in Tabs)
+
+            if (Mouse.IsButtonPressed(Mouse.Button.Right))
             {
-                if (t.MouseOver(x, y) && Mouse.IsButtonPressed(Mouse.Button.Right))
+                Tabs.Reverse();
+                foreach (BrowserTab t in Tabs)
                 {
-                    Tabs.Remove(t);
-                    Tabs.Add(t);
-                    t.mouseDrag = true;
-                    t.dragOffsetX = (uint)(x - t.View.Position.X);
-                    t.dragOffsetY = (uint)(y - t.View.Position.Y);
-                    return;
+                    if (t.MouseOver(x, y))
+                    {
+                        t.mouseDrag = true;
+                        t.dragOffsetX = (uint)(x - t.View.Position.X);
+                        t.dragOffsetY = (uint)(y - t.View.Position.Y);
+                        Tabs.Reverse();
+                        Tabs.Remove(t);
+                        Tabs.Add(t);
+                        return;
+                    }
                 }
             }
-            Tabs.Reverse();
         }
 
         /// <summary>
