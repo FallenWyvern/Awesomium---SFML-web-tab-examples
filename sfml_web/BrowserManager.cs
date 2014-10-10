@@ -162,6 +162,7 @@ namespace sfml_web
         /// <param name="y"></param>
         public static void MouseMove(int x, int y)
         {
+            if (Mouse.IsButtonPressed(Mouse.Button.Right)) { return; }
             foreach (BrowserTab t in Tabs)
             {
                 if (t.MouseOver(x, y) && t.Clickable)
@@ -188,6 +189,10 @@ namespace sfml_web
                         t.MyTab.InjectMouseUp(MouseButton.Left);
                     }, null);
                 }
+                if (t.mouseDrag)
+                {
+                    t.mouseDrag = false;                    
+                }
             }
         }
 
@@ -196,18 +201,33 @@ namespace sfml_web
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
-        public static void MouseDown(int x, int y)
+        public static void MouseDown(int x, int y, SFML.Window.Mouse.Button b)
         {
             foreach (BrowserTab t in Tabs)
             {
-                if (t.MouseOver(x, y) && t.Clickable)
+                if (t.MouseOver(x, y) && t.Clickable && b == Mouse.Button.Left)
                 {
                     awesomiumContext.Send(state =>
                     {
                         t.MyTab.InjectMouseDown(MouseButton.Left);
                     }, null);
+                }                
+            }
+            
+            Tabs.Reverse();
+            foreach (BrowserTab t in Tabs)
+            {
+                if (t.MouseOver(x, y) && Mouse.IsButtonPressed(Mouse.Button.Right))
+                {
+                    Tabs.Remove(t);
+                    Tabs.Add(t);
+                    t.mouseDrag = true;
+                    t.dragOffsetX = (uint)(x - t.View.Position.X);
+                    t.dragOffsetY = (uint)(y - t.View.Position.Y);
+                    return;
                 }
             }
+            Tabs.Reverse();
         }
 
         /// <summary>
@@ -295,6 +315,9 @@ namespace sfml_web
         public Sprite View;             // The SFML Sprite that is returned for drawing.
         public bool Clickable = true;   // Is this view clickable.
         public bool KeyEvents = false;  // Is this view typeable.
+        public bool mouseDrag = false;  // Is this view being dragged.
+        public uint dragOffsetX = 0;    // Where was the mouse when dragging began.
+        public uint dragOffsetY = 0;    // ^
 
         private Texture BrowserTex;     // Texture that copies the Bitmap Surface
         private BitmapSurface s;        // Bitmap surface for the Webview.
@@ -369,6 +392,7 @@ namespace sfml_web
         {
             if (!closing)
             {
+                if (mouseDrag) Move((uint)SFML.Window.Mouse.GetPosition().X - dragOffsetX, (uint)SFML.Window.Mouse.GetPosition().Y - dragOffsetY);
                 return View;
             }
             else
@@ -402,6 +426,8 @@ namespace sfml_web
         /// <param name="y"></param>
         public void Move(uint x, uint y)
         {
+            if (x < 0 || x > 1366) x = 0;
+            if (y < 0 || y > 768) y = 0;
             View.Position = new Vector2f(x, y);
         }
 
